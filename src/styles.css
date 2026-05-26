@@ -127,14 +127,53 @@ h3 {
 }
 
 .primary-button,
-.panel-heading button {
+.panel-heading button,
+.file-button {
   background: #176b87;
   border: 1px solid #176b87;
   border-radius: 6px;
   color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 700;
   min-height: 38px;
   padding: 8px 12px;
+}
+
+.file-button input {
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 1px;
+}
+
+.import-panel {
+  align-items: center;
+  background: var(--panel-bg);
+  border: 1px dashed var(--panel-border);
+  border-radius: 8px;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding: 16px;
+}
+
+.import-panel h2 {
+  margin-bottom: 4px;
+}
+
+.import-panel p {
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.import-panel span {
+  color: var(--subtle);
+  font-size: 0.86rem;
+  font-weight: 700;
 }
 
 .summary-grid,
@@ -386,6 +425,11 @@ pre {
   }
 
   .app-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .import-panel {
     align-items: stretch;
     flex-direction: column;
   }

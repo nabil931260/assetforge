@@ -5,14 +5,17 @@ AssetForge is a browser-based asset pipeline inspector for Godot-style game proj
 The first version focuses on a practical workflow:
 
 1. Load a sample game asset set.
-2. Review detected metadata.
-3. Check Godot-oriented naming and grouping rules.
-4. Edit categories and tags.
-5. Export a `manifest.json` and `import_notes.md`.
+2. Import local files with drag-and-drop or a file picker.
+3. Review detected metadata.
+4. Check Godot-oriented naming and grouping rules.
+5. Edit categories and tags.
+6. Export a `manifest.json` and `import_notes.md`.
 
 ## Current Features
 
 - Sample 2D, audio, model, and data assets
+- Drag-and-drop and file picker import
+- Image dimension detection for imported browser files
 - Lightweight 3D metadata support for `.glb`, `.gltf`, `.fbx`, and `.obj`
 - Godot-style `res://` path generation
 - Validation for unsupported files, duplicate names, spaces, casing, snake_case, missing tags, and large files

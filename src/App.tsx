@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { AssetCategory, AssetRecord } from "./domain/assets";
 import { buildImportNotes, manifestToJson } from "./domain/exporters";
+import { filesToAssetRecords } from "./domain/fileImport";
 import { formatBytes, toGodotPath } from "./domain/metadata";
 import { loadSampleAssets } from "./domain/sampleAssets";
 import { canExport, getIssueSummary, validateAssets } from "./domain/rules";
@@ -39,6 +40,8 @@ export default function App() {
   const [assets, setAssets] = useState<AssetRecord[]>(() => loadSampleAssets());
   const [selectedAssetId, setSelectedAssetId] = useState<string>("sprite-player-idle");
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [isImporting, setIsImporting] = useState(false);
+  const [importMessage, setImportMessage] = useState("Sample asset set loaded.");
   const selectedAsset = assets.find((asset) => asset.id === selectedAssetId) ?? assets[0];
   const issueSummary = getIssueSummary(assets);
   const exportableCount = assets.filter(canExport).length;
@@ -49,6 +52,24 @@ export default function App() {
     const sampleAssets = loadSampleAssets();
     setAssets(sampleAssets);
     setSelectedAssetId(sampleAssets[0]?.id ?? "");
+    setImportMessage("Sample asset set loaded.");
+  }
+
+  async function handleFiles(files: FileList | File[]) {
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
+
+    setIsImporting(true);
+    setImportMessage(`Importing ${fileArray.length} file${fileArray.length === 1 ? "" : "s"}...`);
+
+    try {
+      const importedAssets = await filesToAssetRecords(fileArray);
+      setAssets(importedAssets);
+      setSelectedAssetId(importedAssets[0]?.id ?? "");
+      setImportMessage(`${importedAssets.length} file${importedAssets.length === 1 ? "" : "s"} imported and validated.`);
+    } finally {
+      setIsImporting(false);
+    }
   }
 
   function handleCategoryChange(category: AssetCategory) {
@@ -82,6 +103,34 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      <section
+        className="import-panel"
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={(event) => {
+          event.preventDefault();
+          void handleFiles(event.dataTransfer.files);
+        }}
+      >
+        <div>
+          <h2>Import Assets</h2>
+          <p>Drop sprites, audio, models, or data files here. Folder paths are preserved when the browser provides them.</p>
+          <span>{isImporting ? "Reading files..." : importMessage}</span>
+        </div>
+        <label className="file-button">
+          Choose files
+          <input
+            multiple
+            onChange={(event) => {
+              if (event.target.files) {
+                void handleFiles(event.target.files);
+              }
+              event.currentTarget.value = "";
+            }}
+            type="file"
+          />
+        </label>
+      </section>
 
       <section className="summary-grid" aria-label="Validation summary">
         <div className="summary-card">
