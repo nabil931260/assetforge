@@ -26,6 +26,8 @@ The first version focuses on a practical workflow:
 
 - Sample 2D, audio, model, and data assets
 - Drag-and-drop and file picker import
+- Folder import for preserving browser-provided relative paths
+- Search and filters by status and asset type
 - Image dimension detection for imported browser files
 - Lightweight 3D metadata support for `.glb`, `.gltf`, `.fbx`, and `.obj`
 - Godot-style `res://` path generation

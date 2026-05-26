@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import type { AssetCategory, AssetRecord } from "./domain/assets";
+import type { AssetCategory, AssetKind, AssetRecord } from "./domain/assets";
 import { buildImportNotes, manifestToJson } from "./domain/exporters";
+import { filterAssets, type KindFilter, type StatusFilter } from "./domain/filters";
 import { filesToAssetRecords } from "./domain/fileImport";
 import { formatBytes, toGodotPath } from "./domain/metadata";
 import { markIssueReviewed, reviewedIssues, visibleIssues } from "./domain/review";
@@ -8,6 +9,20 @@ import { loadSampleAssets } from "./domain/sampleAssets";
 import { canExport, getIssueSummary, validateAssets } from "./domain/rules";
 
 const categories: AssetCategory[] = ["sprites", "audio", "models", "data", "misc"];
+const statusFilters: { value: StatusFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "needs_attention", label: "Needs attention" },
+  { value: "reviewed", label: "Reviewed" },
+  { value: "blocked", label: "Blocked" }
+];
+const kindFilters: { value: KindFilter; label: string }[] = [
+  { value: "all", label: "All types" },
+  { value: "image", label: "Images" },
+  { value: "audio", label: "Audio" },
+  { value: "model", label: "Models" },
+  { value: "data", label: "Data" },
+  { value: "unknown", label: "Unknown" }
+];
 
 function downloadText(filename: string, content: string) {
   const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
@@ -47,9 +62,16 @@ export default function App() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isImporting, setIsImporting] = useState(false);
   const [importMessage, setImportMessage] = useState("Sample asset set loaded.");
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [kindFilter, setKindFilter] = useState<KindFilter>("all");
   const selectedAsset = assets.find((asset) => asset.id === selectedAssetId) ?? assets[0];
   const issueSummary = getIssueSummary(assets);
   const exportableCount = assets.filter(canExport).length;
+  const filteredAssets = useMemo(
+    () => filterAssets(assets, { query, status: statusFilter, kind: kindFilter }),
+    [assets, query, statusFilter, kindFilter]
+  );
   const manifestJson = useMemo(() => manifestToJson(assets), [assets]);
   const importNotes = useMemo(() => buildImportNotes(assets), [assets]);
 
@@ -71,6 +93,9 @@ export default function App() {
       const importedAssets = await filesToAssetRecords(fileArray);
       setAssets(importedAssets);
       setSelectedAssetId(importedAssets[0]?.id ?? "");
+      setQuery("");
+      setStatusFilter("all");
+      setKindFilter("all");
       setImportMessage(`${importedAssets.length} file${importedAssets.length === 1 ? "" : "s"} imported and validated.`);
     } finally {
       setIsImporting(false);
@@ -127,19 +152,40 @@ export default function App() {
           <p>Drop sprites, audio, models, or data files here. Folder paths are preserved when the browser provides them.</p>
           <span>{isImporting ? "Reading files..." : importMessage}</span>
         </div>
-        <label className="file-button">
-          Choose files
-          <input
-            multiple
-            onChange={(event) => {
-              if (event.target.files) {
-                void handleFiles(event.target.files);
-              }
-              event.currentTarget.value = "";
-            }}
-            type="file"
-          />
-        </label>
+        <div className="import-actions">
+          <label className="file-button">
+            Choose files
+            <input
+              multiple
+              onChange={(event) => {
+                if (event.target.files) {
+                  void handleFiles(event.target.files);
+                }
+                event.currentTarget.value = "";
+              }}
+              type="file"
+            />
+          </label>
+          <label className="file-button secondary">
+            Choose folder
+            <input
+              multiple
+              onChange={(event) => {
+                if (event.target.files) {
+                  void handleFiles(event.target.files);
+                }
+                event.currentTarget.value = "";
+              }}
+              ref={(input) => {
+                if (input) {
+                  input.setAttribute("webkitdirectory", "");
+                  input.setAttribute("directory", "");
+                }
+              }}
+              type="file"
+            />
+          </label>
+        </div>
       </section>
 
       <section className="summary-grid" aria-label="Validation summary">
@@ -165,7 +211,35 @@ export default function App() {
         <div className="panel asset-list-panel">
           <div className="panel-heading">
             <h2>Imported Assets</h2>
-            <span>{assets.length} files</span>
+            <span>
+              {filteredAssets.length} of {assets.length} files
+            </span>
+          </div>
+          <div className="table-controls">
+            <label>
+              Search
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="name, path, tag" />
+            </label>
+            <label>
+              Status
+              <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}>
+                {statusFilters.map((filter) => (
+                  <option key={filter.value} value={filter.value}>
+                    {filter.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Type
+              <select value={kindFilter} onChange={(event) => setKindFilter(event.target.value as AssetKind | "all")}>
+                {kindFilters.map((filter) => (
+                  <option key={filter.value} value={filter.value}>
+                    {filter.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="asset-table">
             <div className="asset-row header-row">
@@ -174,7 +248,7 @@ export default function App() {
               <span>Size</span>
               <span>Status</span>
             </div>
-            {assets.map((asset) => (
+            {filteredAssets.map((asset) => (
               <button
                 className={`asset-row ${asset.id === selectedAsset?.id ? "selected" : ""}`}
                 key={asset.id}
@@ -191,6 +265,7 @@ export default function App() {
                 </span>
               </button>
             ))}
+            {filteredAssets.length === 0 && <p className="empty-table">No assets match the current filters.</p>}
           </div>
         </div>
 

@@ -141,6 +141,11 @@ h3 {
   padding: 8px 12px;
 }
 
+.file-button.secondary {
+  background: transparent;
+  color: #176b87;
+}
+
 .file-button input {
   height: 1px;
   opacity: 0;
@@ -159,6 +164,13 @@ h3 {
   justify-content: space-between;
   margin-bottom: 14px;
   padding: 16px;
+}
+
+.import-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
 }
 
 .import-panel h2 {
@@ -247,6 +259,14 @@ h3 {
   display: grid;
 }
 
+.table-controls {
+  border-bottom: 1px solid var(--panel-border);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(220px, 1fr) 190px 160px;
+  padding: 14px 16px;
+}
+
 .asset-row {
   align-items: center;
   background: transparent;
@@ -280,6 +300,12 @@ h3 {
   color: var(--subtle);
   display: block;
   overflow-wrap: anywhere;
+}
+
+.empty-table {
+  color: var(--muted);
+  margin: 0;
+  padding: 22px 16px;
 }
 
 .pill {
@@ -470,6 +496,13 @@ pre {
   .import-panel {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .import-actions,
+  .table-controls {
+    align-items: stretch;
+    flex-direction: column;
+    display: flex;
   }
 
   .header-actions {
