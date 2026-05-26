@@ -24,4 +24,5 @@ export type AssetRecord = {
   tags: string[];
   godotPath: string;
   issues: ValidationIssue[];
+  reviewedIssueCodes: string[];
 };

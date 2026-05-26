@@ -9,7 +9,8 @@ The first version focuses on a practical workflow:
 3. Review detected metadata.
 4. Check Godot-oriented naming and grouping rules.
 5. Edit categories and tags.
-6. Export a `manifest.json` and `import_notes.md`.
+6. Mark non-blocking warnings as reviewed.
+7. Export a `manifest.json` and `import_notes.md`.
 
 ## Current Features
 
@@ -20,6 +21,7 @@ The first version focuses on a practical workflow:
 - Godot-style `res://` path generation
 - Validation for unsupported files, duplicate names, spaces, casing, snake_case, missing tags, and large files
 - Editable categories and tags
+- Reviewed-warning workflow for non-blocking validation issues
 - Manifest and import-notes previews
 - Download buttons for both export files
 - Unit tests for metadata, validation, and exporters

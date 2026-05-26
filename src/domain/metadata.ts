@@ -86,7 +86,8 @@ export function createAssetRecord(input: RawAssetInput): AssetRecord {
     category,
     tags: input.tags ?? [],
     godotPath: "",
-    issues: []
+    issues: [],
+    reviewedIssueCodes: []
   };
 
   return {

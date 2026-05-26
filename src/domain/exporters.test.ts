@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildImportNotes, buildManifest } from "./exporters";
 import { createAssetRecord } from "./metadata";
+import { markIssueReviewed } from "./review";
 import { validateAssets } from "./rules";
 
 describe("exporters", () => {
@@ -52,5 +53,23 @@ describe("exporters", () => {
     expect(notes).toContain("Blocked From Export");
     expect(notes).toContain("wall-normal.tga");
     expect(notes).toContain("Forest Theme.mp3");
+  });
+
+  it("moves reviewed warnings into a separate notes section", () => {
+    const [asset] = validateAssets([
+      createAssetRecord({
+        id: "music",
+        name: "Forest Theme.mp3",
+        originalPath: "Audio/Forest Theme.mp3",
+        sizeBytes: 12_000_000,
+        tags: []
+      })
+    ]);
+
+    const notes = buildImportNotes([markIssueReviewed(asset, "spaces_in_name")]);
+
+    expect(notes).toContain("Reviewed Warnings");
+    expect(notes).toContain("Forest Theme.mp3");
+    expect(notes).not.toContain("## Rename Before Import\n- `Forest Theme.mp3`: Filename contains spaces.");
   });
 });

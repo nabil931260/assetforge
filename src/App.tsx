@@ -3,6 +3,7 @@ import type { AssetCategory, AssetRecord } from "./domain/assets";
 import { buildImportNotes, manifestToJson } from "./domain/exporters";
 import { filesToAssetRecords } from "./domain/fileImport";
 import { formatBytes, toGodotPath } from "./domain/metadata";
+import { markIssueReviewed, reviewedIssues, visibleIssues } from "./domain/review";
 import { loadSampleAssets } from "./domain/sampleAssets";
 import { canExport, getIssueSummary, validateAssets } from "./domain/rules";
 
@@ -34,6 +35,10 @@ function updateAsset(assets: AssetRecord[], assetId: string, update: Partial<Ass
   });
 
   return validateAssets(nextAssets);
+}
+
+function updateReviewedIssue(assets: AssetRecord[], assetId: string, issueCode: string) {
+  return assets.map((asset) => (asset.id === assetId ? markIssueReviewed(asset, issueCode) : asset));
 }
 
 export default function App() {
@@ -84,6 +89,11 @@ export default function App() {
       .map((tag) => tag.trim())
       .filter(Boolean);
     setAssets((current) => updateAsset(current, selectedAsset.id, { tags }));
+  }
+
+  function handleReviewIssue(issueCode: string) {
+    if (!selectedAsset) return;
+    setAssets((current) => updateReviewedIssue(current, selectedAsset.id, issueCode));
   }
 
   return (
@@ -162,7 +172,7 @@ export default function App() {
               <span>Name</span>
               <span>Kind</span>
               <span>Size</span>
-              <span>Issues</span>
+              <span>Status</span>
             </div>
             {assets.map((asset) => (
               <button
@@ -177,7 +187,7 @@ export default function App() {
                 <span className={`pill ${asset.kind}`}>{asset.kind}</span>
                 <span>{formatBytes(asset.sizeBytes)}</span>
                 <span className={asset.issues.some((issue) => issue.severity === "error") ? "issue-error" : "issue-count"}>
-                  {asset.issues.length}
+                  {visibleIssues(asset).length === 0 ? "Reviewed" : `${visibleIssues(asset).length} open`}
                 </span>
               </button>
             ))}
@@ -227,15 +237,30 @@ export default function App() {
 
               <div className="issues">
                 <h3>Validation</h3>
-                {selectedAsset.issues.length === 0 ? (
-                  <p className="empty-state">No issues found for this asset.</p>
+                {visibleIssues(selectedAsset).length === 0 ? (
+                  <p className="empty-state">No open issues for this asset.</p>
                 ) : (
-                  selectedAsset.issues.map((issue) => (
+                  visibleIssues(selectedAsset).map((issue) => (
                     <div className={`issue ${issue.severity}`} key={`${selectedAsset.id}-${issue.code}`}>
-                      <strong>{issue.message}</strong>
-                      {issue.suggestion && <span>{issue.suggestion}</span>}
+                      <div>
+                        <strong>{issue.message}</strong>
+                        {issue.suggestion && <span>{issue.suggestion}</span>}
+                      </div>
+                      {issue.severity === "warning" && (
+                        <button onClick={() => handleReviewIssue(issue.code)} type="button">
+                          Mark reviewed
+                        </button>
+                      )}
                     </div>
                   ))
+                )}
+                {reviewedIssues(selectedAsset).length > 0 && (
+                  <div className="reviewed-list">
+                    <h4>Reviewed warnings</h4>
+                    {reviewedIssues(selectedAsset).map((issue) => (
+                      <span key={`${selectedAsset.id}-reviewed-${issue.code}`}>{issue.message}</span>
+                    ))}
+                  </div>
                 )}
               </div>
             </>

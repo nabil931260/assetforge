@@ -1,4 +1,5 @@
 import type { AssetRecord } from "./assets";
+import { reviewedIssues, visibleIssues } from "./review";
 import { canExport } from "./rules";
 
 type ManifestAsset = {
@@ -51,17 +52,18 @@ export function manifestToJson(assets: AssetRecord[]): string {
 
 export function buildImportNotes(assets: AssetRecord[]): string {
   const blockedAssets = assets.filter((asset) => !canExport(asset));
-  const assetsWithIssues = assets.filter((asset) => asset.issues.length > 0);
+  const assetsWithIssues = assets.filter((asset) => visibleIssues(asset).length > 0);
   const renameIssues = assets.flatMap((asset) =>
-    asset.issues
+    visibleIssues(asset)
       .filter((issue) => ["spaces_in_name", "not_lowercase", "not_snake_case", "duplicate_base_name"].includes(issue.code))
       .map((issue) => ({ asset, issue }))
   );
   const manualReviews = assets.flatMap((asset) =>
-    asset.issues
+    visibleIssues(asset)
       .filter((issue) => !["spaces_in_name", "not_lowercase", "not_snake_case", "duplicate_base_name"].includes(issue.code))
       .map((issue) => ({ asset, issue }))
   );
+  const reviewedWarnings = assets.flatMap((asset) => reviewedIssues(asset).map((issue) => ({ asset, issue })));
 
   const lines = [
     "# Godot Import Notes",
@@ -97,6 +99,15 @@ export function buildImportNotes(assets: AssetRecord[]): string {
   } else {
     manualReviews.forEach(({ asset, issue }) => {
       lines.push(`- \`${asset.name}\`: ${issue.message}${issue.suggestion ? ` ${issue.suggestion}` : ""}`);
+    });
+  }
+
+  lines.push("", "## Reviewed Warnings");
+  if (reviewedWarnings.length === 0) {
+    lines.push("- No reviewed warnings.");
+  } else {
+    reviewedWarnings.forEach(({ asset, issue }) => {
+      lines.push(`- \`${asset.name}\`: ${issue.message}`);
     });
   }
 

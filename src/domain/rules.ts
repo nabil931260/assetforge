@@ -94,6 +94,7 @@ export function validateAssets(assets: AssetRecord[]): AssetRecord[] {
     return {
       ...asset,
       godotPath: toGodotPath(asset),
+      reviewedIssueCodes: asset.reviewedIssueCodes.filter((code) => issues.some((issueItem) => issueItem.code === code && issueItem.severity === "warning")),
       issues
     };
   });

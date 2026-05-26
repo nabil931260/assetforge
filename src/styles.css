@@ -380,11 +380,29 @@ select {
 }
 
 .issue {
+  align-items: center;
   border-left: 3px solid #d0d5dd;
-  display: grid;
+  display: flex;
   gap: 3px;
+  justify-content: space-between;
   margin-bottom: 10px;
   padding: 8px 10px;
+}
+
+.issue div {
+  display: grid;
+  gap: 3px;
+}
+
+.issue button {
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  color: #176b87;
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 6px 8px;
 }
 
 .issue.warning {
@@ -401,6 +419,26 @@ select {
 .empty-state {
   color: var(--muted);
   font-size: 0.86rem;
+}
+
+.reviewed-list {
+  border-top: 1px solid var(--panel-border);
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding-top: 12px;
+}
+
+.reviewed-list h4 {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.reviewed-list span {
+  color: var(--subtle);
+  font-size: 0.84rem;
 }
 
 .export-grid {
