@@ -2,6 +2,8 @@
 
 AssetForge is a browser-based asset pipeline inspector for Godot-style game projects. It helps review messy game assets before they move into an engine project.
 
+Live demo: https://nabil931260.github.io/assetforge/
+
 The first version focuses on a practical workflow:
 
 1. Load a sample game asset set.
@@ -51,6 +53,8 @@ Build:
 ```bash
 npm run build
 ```
+
+The production build is deployed to GitHub Pages from the `main` branch.
 
 ## Intentional Scope
 
