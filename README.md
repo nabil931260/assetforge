@@ -4,6 +4,14 @@ AssetForge is a browser-based asset pipeline inspector for Godot-style game proj
 
 Live demo: https://nabil931260.github.io/assetforge/
 
+## Screenshots
+
+![AssetForge dashboard](docs/images/dashboard.png)
+
+![Inspector with validation warnings](docs/images/inspector-warning.png)
+
+![Manifest and import notes preview](docs/images/export-preview.png)
+
 The first version focuses on a practical workflow:
 
 1. Load a sample game asset set.
@@ -34,6 +42,28 @@ The first version focuses on a practical workflow:
 - Audio: `.wav`, `.ogg`, `.mp3`
 - Models: `.glb`, `.gltf`, `.fbx`, `.obj`
 - Data/config: `.json`, `.csv`, `.txt`
+
+## Example Output
+
+AssetForge exports a Godot-friendly manifest:
+
+```json
+{
+  "engine": "godot",
+  "generatedBy": "AssetForge",
+  "assets": [
+    {
+      "name": "player_idle.png",
+      "kind": "image",
+      "category": "sprites",
+      "path": "res://sprites/player_idle.png",
+      "tags": ["player", "idle"]
+    }
+  ]
+}
+```
+
+It also exports import notes that summarize blocked files, rename suggestions, and reviewed warnings.
 
 ## Run Locally
 
