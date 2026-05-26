@@ -38,6 +38,7 @@ function updateAsset(assets: AssetRecord[], assetId: string, update: Partial<Ass
 export default function App() {
   const [assets, setAssets] = useState<AssetRecord[]>(() => loadSampleAssets());
   const [selectedAssetId, setSelectedAssetId] = useState<string>("sprite-player-idle");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const selectedAsset = assets.find((asset) => asset.id === selectedAssetId) ?? assets[0];
   const issueSummary = getIssueSummary(assets);
   const exportableCount = assets.filter(canExport).length;
@@ -65,15 +66,21 @@ export default function App() {
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" data-theme={theme}>
       <header className="app-header">
         <div>
           <p className="eyebrow">Godot asset pipeline inspector</p>
           <h1>AssetForge</h1>
         </div>
-        <button className="primary-button" onClick={handleLoadSamples}>
-          Load sample assets
-        </button>
+        <div className="header-actions">
+          <label className="theme-toggle">
+            <span>Dark mode</span>
+            <input checked={theme === "dark"} onChange={(event) => setTheme(event.target.checked ? "dark" : "light")} type="checkbox" />
+          </label>
+          <button className="primary-button" onClick={handleLoadSamples}>
+            Load sample assets
+          </button>
+        </div>
       </header>
 
       <section className="summary-grid" aria-label="Validation summary">
