@@ -4,6 +4,8 @@ AssetForge is a browser-based asset pipeline inspector for Godot-style game proj
 
 Live demo: https://nabil931260.github.io/assetforge/
 
+Current status: **v0.1.0 beta**
+
 ## Screenshots
 
 ![AssetForge dashboard](docs/images/dashboard.png)
@@ -87,6 +89,15 @@ npm run build
 ```
 
 The production build is deployed to GitHub Pages from the `main` branch.
+
+## Feedback Wanted
+
+This is a beta build. Feedback is most useful around:
+
+- asset validation rules that should be stricter or looser
+- Godot import workflow details that feel inaccurate
+- file types or metadata that should be supported next
+- export formats that would make the tool more useful
 
 ## Intentional Scope
 
